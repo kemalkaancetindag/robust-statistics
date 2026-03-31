@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Robust İstatistik / Robust Statistics — Universal Calculator</title>
+<style>
+  :root{--bg:#0a0b0f;--bg2:#111318;--bg3:#181b26;--bg4:#1e2130;--border:#252a3e;--text:#c8ccd8;--dim:#5a6080;--amber:#e8a830;--teal:#4ec9a8;--blue:#5b9fd8;--red:#e06c75;--green:#7ec898;--purple:#c792ea;--en:#5a6aaa;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Courier New',Courier,monospace;font-size:13px;line-height:1.65;min-height:100vh;}
+  .header{background:linear-gradient(135deg,#0d0f1a,#13182a);border-bottom:2px solid var(--amber);padding:20px 28px 16px;position:relative;}
+  .header::after{content:'';position:absolute;bottom:-2px;left:0;width:120px;height:2px;background:var(--teal);}
+  .header h1{font-size:15px;font-weight:bold;letter-spacing:.10em;color:var(--amber);font-family:Georgia,serif;text-transform:uppercase;}
+  .header h1 .en-h{color:#7a6820;font-size:12px;}
+  .header p{color:var(--dim);font-size:11px;margin-top:4px;}
+  .lbs{display:flex;gap:6px;margin-top:7px;}
+  .lb{font-size:10px;border:1px solid;border-radius:3px;padding:1px 7px;letter-spacing:.06em;}
+  .lb.tr{border-color:var(--amber)88;color:var(--amber);}
+  .lb.en{border-color:var(--en);color:var(--en);}
+  .lb.any{border-color:var(--green)88;color:var(--green);}
+  .main{max-width:1020px;margin:0 auto;padding:22px;}
+  /* Input */
+  .ip{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px 18px;margin-bottom:18px;display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;}
+  .ig{display:flex;flex-direction:column;gap:4px;}
+  .ig.grow{flex:1;min-width:180px;}
+  .ig label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;}
+  .ig label .t{color:var(--dim);}
+  .ig label .e{color:var(--en);margin-left:4px;font-size:9px;}
+  .ig input,.ig select{background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:inherit;font-size:13px;padding:7px 10px;outline:none;transition:border-color .2s;}
+  .ig input:focus,.ig select:focus{border-color:var(--amber);}
+  .ig.small input,.ig.small select{width:120px;}
+  .cbtn{background:var(--amber);color:#080a10;border:none;border-radius:4px;padding:9px 20px;font-family:inherit;font-weight:bold;font-size:11px;letter-spacing:.08em;cursor:pointer;text-transform:uppercase;transition:opacity .2s;height:35px;}
+  .cbtn:hover{opacity:.85;}
+  .cbtn:disabled{opacity:.4;cursor:not-allowed;}
+  /* Sections */
+  .section{background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:16px;overflow:hidden;}
+  .sh{padding:12px 16px;background:var(--bg3);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;}
+  .sh:hover{background:var(--bg4);}
+  .sh .tag{font-size:10px;font-weight:bold;padding:2px 8px;border-radius:3px;letter-spacing:.06em;flex-shrink:0;}
+  .sh .tag.q1{background:var(--teal);color:#07120e;}
+  .sh .tag.q2{background:var(--amber);color:#100900;}
+  .sh .tag.q3{background:var(--blue);color:#050d18;}
+  .sh .tag.qx{background:var(--purple);color:#0d0520;}
+  .sh .title{font-family:Georgia,serif;font-size:13px;color:var(--text);}
+  .sh .title .en{color:var(--en);font-size:11px;font-style:italic;display:block;margin-top:1px;}
+  .sh .tog{margin-left:auto;color:var(--dim);font-size:11px;flex-shrink:0;}
+  .sb{padding:18px;}
+  .sb.hidden{display:none;}
+  /* Subsection */
+  .ss{margin-bottom:20px;}
+  .ss:last-child{margin-bottom:0;}
+  .sst{font-size:11px;text-transform:uppercase;letter-spacing:.10em;border-bottom:1px solid var(--border);padding-bottom:4px;margin-bottom:10px;display:flex;align-items:baseline;gap:8px;}
+  .sst .en{color:var(--en);font-size:9px;font-style:italic;text-transform:none;letter-spacing:.04em;}
+  .sst{color:var(--teal);}
+  .sst.a{color:var(--amber);}
+  .sst.a .en{color:#806030;}
+  .sst.b{color:var(--blue);}
+  .sst.b .en{color:#3a5a80;}
+  /* Result row */
+  .rr{display:flex;gap:8px;align-items:baseline;padding:5px 0;border-bottom:1px solid #141720;flex-wrap:wrap;}
+  .rr .lbl{min-width:230px;flex-shrink:0;}
+  .rr .lbl .t{color:var(--dim);display:block;font-size:12px;}
+  .rr .lbl .e{color:var(--en);display:block;font-size:10px;font-style:italic;}
+  .rr .val{color:var(--amber);font-weight:bold;}
+  .rr .note{color:#3a5080;font-size:11px;margin-left:8px;}
+  /* Step */
+  .step{background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--teal);border-radius:4px;padding:10px 13px;margin-top:7px;font-size:12px;color:var(--dim);}
+  .step.a{border-left-color:var(--amber);}
+  .step.b{border-left-color:var(--blue);}
+  .step .em{color:var(--text);}
+  .step .res{color:var(--amber);font-weight:bold;}
+  .step .hi{color:var(--teal);}
+  .bl{display:grid;grid-template-columns:1fr 1fr;gap:0 14px;border-bottom:1px solid #181d2c;padding:3px 0;}
+  .bl .t{color:var(--dim);font-size:12px;}
+  .bl .e{color:var(--en);font-size:11px;font-style:italic;}
+  .bl:last-child{border-bottom:none;}
+  /* Chips */
+  .chip{border-radius:10px;padding:2px 9px;font-size:12px;border:1px solid;display:inline-block;}
+  .chip.d{border-color:var(--border);color:var(--text);background:var(--bg3);}
+  .chip.so{border-color:var(--teal)88;color:var(--teal);background:#0a1a1680;}
+  .chip.me{border-color:var(--amber)88;color:var(--amber);background:#1a100080;}
+  /* Table */
+  table{width:100%;border-collapse:collapse;margin-top:9px;}
+  th{background:var(--bg3);color:var(--dim);font-size:10px;text-transform:uppercase;letter-spacing:.06em;padding:7px 11px;text-align:left;border-bottom:1px solid var(--border);}
+  th .en{color:var(--en);display:block;font-style:italic;text-transform:none;font-size:9px;margin-top:1px;}
+  td{padding:7px 11px;border-bottom:1px solid #141720;font-size:12px;}
+  td.best{color:var(--green);font-weight:bold;}
+  td.worst{color:var(--red);}
+  td.val{color:var(--amber);}
+  td.est{color:var(--text);}
+  tr:hover td{background:#141720;}
+  /* Rank strip */
+  .rs{display:flex;align-items:stretch;margin-top:14px;border:1px solid var(--border);border-radius:6px;overflow:hidden;flex-wrap:wrap;}
+  .ri{flex:1;min-width:90px;padding:9px 7px;text-align:center;border-right:1px solid var(--border);}
+  .ri:last-child{border-right:none;}
+  .ri.best{background:#0a1a1280;}
+  .ri.worst{background:#1a0a0c80;}
+  .ri .rn{font-size:12px;}
+  .ri .rv{color:var(--amber);font-size:10px;}
+  .ri .rl{color:var(--dim);font-size:9px;margin-top:2px;}
+  .ri .rle{color:var(--en);font-size:9px;font-style:italic;}
+  .best .rn{color:var(--green);}
+  .worst .rn{color:var(--red);}
+  .ra{color:var(--dim);align-self:center;padding:0 2px;font-size:11px;flex-shrink:0;}
+  /* Coef */
+  .ccr{display:flex;gap:5px;flex-wrap:wrap;margin:3px 0;}
+  .cc{background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:2px 7px;font-size:11px;color:var(--purple);}
+  /* Cards */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:11px;margin-top:11px;}
+  .card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:12px;}
+  .card .ct{color:var(--dim);font-size:10px;text-transform:uppercase;letter-spacing:.07em;}
+  .card .ce{color:var(--en);font-size:9px;font-style:italic;margin-bottom:4px;}
+  .card .cv{color:var(--amber);font-size:18px;font-weight:bold;}
+  .card .cs{color:var(--dim);font-size:11px;margin-top:2px;}
+  .card.tl{border-color:var(--teal)66;}
+  .card.am{border-color:var(--amber)66;}
+  .card.bl{border-color:var(--blue)66;}
+  .card.rd{border-color:var(--red)66;}
+  .card.gr{border-color:var(--green)66;}
+  /* OM matrix display */
+  .mat{display:inline-flex;align-items:center;margin:6px 0;overflow-x:auto;max-width:100%;}
+  .mat-b{font-size:28px;color:var(--dim);font-weight:100;font-family:'Times New Roman',serif;line-height:1;}
+  .mat-in{padding:2px 5px;}
+  .mat-row{display:flex;gap:8px;}
+  .mat-c{width:50px;text-align:right;font-size:11px;color:var(--text);}
+  .mat-c.hi{color:var(--amber);}
+  /* EX vector */
+  .exvec{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0;}
+  .exc{background:var(--bg3);border:1px solid var(--border)44;border-radius:3px;padding:2px 8px;font-size:11px;color:var(--teal);}
+  /* Warn / info */
+  .warn{background:#2a1a0820;border:1px solid #80500030;border-radius:4px;padding:9px 13px;color:#c08040;font-size:12px;margin:8px 0;}
+  .info{background:#0a1a2820;border:1px solid var(--blue)33;border-radius:4px;padding:8px 12px;color:var(--blue);font-size:11px;margin:6px 0;}
+  .intro{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:20px;color:var(--dim);text-align:center;}
+  .intro span{color:var(--amber);}
+  /* Loading */
+  .loading{display:flex;align-items:center;gap:10px;padding:16px;color:var(--dim);font-size:12px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--amber);border-radius:50%;animation:spin .8s linear infinite;}
+  /* T formula badge */
+  .tf-badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:3px;margin-left:8px;border:1px solid var(--purple)66;color:var(--purple);}
+  @media(max-width:660px){.ip{flex-direction:column;}.ig.small input,.ig.small select{width:100%;}.rr .lbl{min-width:100%;}.bl{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Robust İstatistik Hesaplayıcı &nbsp;<span class="en-h">/ Robust Statistics Calculator</span></h1>
+  <p>Herhangi n ve α için tam çözüm &nbsp;/&nbsp; Complete solution for any n and α &nbsp;·&nbsp; ex ve Ω sayısal hesaplanır / ex &amp; Ω computed numerically</p>
+  <div class="lbs">
+    <span class="lb tr">TR Türkçe</span>
+    <span class="lb en">EN English</span>
+    <span class="lb any">∀n Genel / Universal</span>
+  </div>
+</div>
+<div class="main">
+  <div class="ip">
+    <div class="ig grow">
+      <label><span class="t">Veri</span><span class="e">/ Data (space or comma separated)</span></label>
+      <input id="inp" type="text" value="10 8 12 5 9">
+    </div>
+    <div class="ig small">
+      <label><span class="t">α (alpha)</span><span class="e">/ trimming prop.</span></label>
+      <input id="alf" type="number" value="0.25" step="0.05" min="0.05" max="0.45">
+    </div>
+    <div class="ig small">
+      <label><span class="t">T formülü</span><span class="e">/ T formula</span></label>
+      <select id="tform">
+        <option value="1">T₁ = (Min+Med+Max)/3</option>
+        <option value="2">T₂ = (Min+2Med+Max)/4</option>
+      </select>
+    </div>
+    <button class="cbtn" id="btn" onclick="compute()">▶ Hesapla / Calculate</button>
+  </div>
+  <div id="out"><div class="intro">Veri girip <span>Hesapla / Calculate</span> butonuna tıklayın.</div></div>
+</div>
+
+<script>
+// ════════════════════════════════
+//  MATH UTILITIES
+// ════════════════════════════════
+const SQRT2PI=Math.sqrt(2*Math.PI);
+function phi(x){return Math.exp(-.5*x*x)/SQRT2PI;}
+function Phi(x){
+  if(x<-8)return 0;if(x>8)return 1;
+  const p=0.3275911,a=[.254829592,-.284496736,1.421413741,-1.453152027,1.061405429];
+  const s=x<0?-1:1,u=Math.abs(x),t=1/(1+p*u);
+  return .5*(1+s*(1-((((a[4]*t+a[3])*t+a[2])*t+a[1])*t+a[0])*t*Math.exp(-u*u)));
+}
+function gamma(z){
+  if(z<.5)return Math.PI/(Math.sin(Math.PI*z)*gamma(1-z));
+  z-=1;const g=7,c=[.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+  let x=c[0];for(let i=1;i<=g+1;i++)x+=c[i]/(z+i);
+  const t=z+g+.5;return Math.sqrt(2*Math.PI)*Math.pow(t,z+.5)*Math.exp(-t)*x;
+}
+function logFact(n){let r=0;for(let i=2;i<=n;i++)r+=Math.log(i);return r;}
+function oCoeff(n,i){return Math.exp(logFact(n)-logFact(i-1)-logFact(n-i));}
+
+// ════════════════════════════════
+//  NUMERICAL ORDER STATISTICS
+// ════════════════════════════════
+const TR=5.5,P1=600,P2O=130,P2I=100;
+
+function computeEx(n){
+  const ex=[],h=(2*TR)/P1;
+  for(let i=1;i<=n;i++){
+    const C=oCoeff(n,i);let s=0;
+    for(let k=0;k<=P1;k++){
+      const x=-TR+k*h,w=k===0||k===P1?.5:1;
+      const P=Phi(x),p=phi(x);
+      if(P<1e-14||(1-P)<1e-14)continue;
+      s+=w*h*x*C*Math.pow(P,i-1)*Math.pow(1-P,n-i)*p;
+    }
+    ex.push(s);
+  }
+  return ex;
+}
+
+function computeOM(n,ex){
+  const om=Array.from({length:n},()=>new Array(n).fill(0));
+  const h=(2*TR)/P1;
+  // Diagonal: E[Z²] - E[Z]²
+  for(let i=1;i<=n;i++){
+    const C=oCoeff(n,i);let ex2=0;
+    for(let k=0;k<=P1;k++){
+      const x=-TR+k*h,w=k===0||k===P1?.5:1;
+      const P=Phi(x),p=phi(x);
+      if(P<1e-14||(1-P)<1e-14)continue;
+      ex2+=w*h*x*x*C*Math.pow(P,i-1)*Math.pow(1-P,n-i)*p;
+    }
+    om[i-1][i-1]=ex2-ex[i-1]*ex[i-1];
+  }
+  // Off-diagonal: E[Z_i·Z_j] - E[Z_i]·E[Z_j] via double integral
+  const ho=(2*TR)/P2O;
+  for(let i=1;i<=n;i++){
+    for(let j=i+1;j<=n;j++){
+      const logK=logFact(n)-logFact(i-1)-logFact(j-i-1)-logFact(n-j);
+      const K=Math.exp(logK);
+      let exy=0;
+      for(let ko=0;ko<=P2O;ko++){
+        const x=-TR+ko*ho,wo=ko===0||ko===P2O?.5:1;
+        const Px=Phi(x),px=phi(x);
+        if(Px<1e-10||Px>1-1e-10)continue;
+        const xf=Math.pow(Px,i-1)*px;
+        const ib=TR,il=ib-x;if(il<=0)continue;
+        const hi=il/P2I;let is=0;
+        for(let ki=0;ki<=P2I;ki++){
+          const y=x+ki*hi,wi=ki===0||ki===P2I?.5:1;
+          const Py=Phi(y),py=phi(y);
+          if(Py>1-1e-10)continue;
+          const d=Py-Px;if(d<0)continue;
+          const mf=j-i-1>0?Math.pow(Math.max(d,0),j-i-1):1;
+          const rf=n-j>0?Math.pow(1-Py,n-j):1;
+          is+=wi*hi*y*mf*rf*py;
+        }
+        exy+=wo*ho*x*K*xf*is;
+      }
+      const cov=exy-ex[i-1]*ex[j-1];
+      om[i-1][j-1]=om[j-1][i-1]=cov;
+    }
+  }
+  return om;
+}
+
+// ════════════════════════════════
+//  MATRIX OPS
+// ════════════════════════════════
+function Tr(M){return M[0].map((_,j)=>M.map(r=>r[j]));}
+function mm(A,B){return A.map(r=>B[0].map((_,j)=>r.reduce((s,_,k)=>s+r[k]*B[k][j],0)));}
+function dot(a,b){return a.reduce((s,x,i)=>s+x*b[i],0);}
+function qf(a,M){let s=0;for(let i=0;i<a.length;i++)for(let j=0;j<a.length;j++)s+=a[i]*M[i][j]*a[j];return s;}
+function inv(M){
+  const n=M.length;
+  const A=M.map((r,i)=>[...r,...Array.from({length:n},(_,j)=>i===j?1:0)]);
+  for(let c=0;c<n;c++){
+    let mr=c;for(let r=c+1;r<n;r++)if(Math.abs(A[r][c])>Math.abs(A[mr][c]))mr=r;
+    [A[c],A[mr]]=[A[mr],A[c]];
+    const pv=A[c][c];if(Math.abs(pv)<1e-12)continue;
+    A[c]=A[c].map(x=>x/pv);
+    for(let r=0;r<n;r++)if(r!==c){const f=A[r][c];A[r]=A[r].map((x,j)=>x-f*A[c][j]);}
+  }
+  return A.map(r=>r.slice(n));
+}
+
+// ════════════════════════════════
+//  CORE CALCULATION
+// ════════════════════════════════
+function calcAll(data,alpha,tForm){
+  const n=data.length;
+  const xs=[...data].sort((a,b)=>a-b);
+  // Basic stats
+  const xbar=data.reduce((s,x)=>s+x,0)/n;
+  const s2=data.reduce((s,x)=>s+(x-xbar)**2,0)/(n-1);
+  const s=Math.sqrt(s2);
+  const an=(gamma(n/2)*Math.sqrt(2))/(gamma((n-1)/2)*Math.sqrt(n-1));
+  const sigHat=s/an;
+  // Median
+  const medIdx=n%2===1?(n-1)/2:[n/2-1,n/2];
+  const med=n%2===1?xs[medIdx]:(xs[medIdx[0]]+xs[medIdx[1]])/2;
+  // Tukey
+  const rT=Math.floor(.5+alpha*n);
+  let tmuS=0;for(let i=rT;i<=n-rT-1;i++)tmuS+=xs[i];
+  const tmu=tmuS/(n-2*rT);
+  let tsiS=0;for(let i=rT;i<=n-rT-1;i++)tsiS+=(xs[i]-tmu)**2;
+  tsiS+=rT*((xs[rT]-tmu)**2+(xs[n-rT-1]-tmu)**2);
+  const tsig=Math.sqrt(tsiS/(n-2*rT-1));
+  // Trimmed mean
+  const g=Math.floor(alpha*n),rem=alpha*n-g;
+  let trimS=0;for(let i=g+1;i<=n-g-2;i++)trimS+=xs[i];
+  trimS+=(1-rem)*(xs[g]+xs[n-g-1]);
+  const trimMu=trimS/(n*(1-2*alpha));
+  // T formula
+  const lmi=Math.floor((n+1)/2)-1; // lower median index (0-based)
+  const T1=(xs[0]+xs[lmi]+xs[n-1])/3;
+  const T2=(xs[0]+2*med+xs[n-1])/4;
+  const Tval=tForm===2?T2:T1;
+  // Numerical ex and OM
+  const ex=computeEx(n);
+  const om=computeOM(n,ex);
+  // BLUE via GLS
+  let blue=null;
+  try{
+    const A=ex.map(e=>[1,e]);
+    const omI=inv(om);
+    const At=Tr(A);
+    const AtOI=mm(At,omI);
+    const coef=mm(inv(mm(AtOI,A)),AtOI);
+    blue={mu:dot(coef[0],xs),sigma:dot(coef[1],xs),coef};
+  }catch(e){}
+  return{n,data,xs,xbar,s2,s,an,sigHat,med,medIdx,rT,tmu,tsig,g,rem,trimMu,T1,T2,Tval,tForm,ex,om,blue,alpha,lmi};
+}
+
+// ════════════════════════════════
+//  HELPER RENDERERS
+// ════════════════════════════════
+const f4=x=>x.toFixed(4);
+function rr(lt,le,val,note=''){
+  return `<div class="rr"><span class="lbl"><span class="t">${lt}</span><span class="e">${le}</span></span><span class="val">${val}</span>${note?`<span class="note">// ${note}</span>`:''}</div>`;
+}
+function blr(t,e){return `<div class="bl"><span class="t">${t}</span><span class="e">${e}</span></div>`;}
+function sst(cls,t,e){return `<div class="sst ${cls}">${t}<span class="en">/ ${e}</span></div>`;}
+function crd(cls,ct,ce,cv,cs){return `<div class="card ${cls}"><div class="ct">${ct}</div><div class="ce">${ce}</div><div class="cv">${cv}</div><div class="cs">${cs}</div></div>`;}
+function aVec(a,n){return `[${a.map(v=>v===0?'0':f4(v)).join(', ')}]`;}
+
+// ════════════════════════════════
+//  Q1: ESTIMATORS
+// ════════════════════════════════
+function renderQ1(R){
+  const{n,data,xs,xbar,s2,s,an,sigHat,med,medIdx,rT,tmu,tsig,g,rem,trimMu,T1,T2,Tval,tForm,ex,om,blue,alpha,lmi}=R;
+  const depth=Math.floor((n+1)/2);
+  const dChips=data.map(v=>`<span class="chip d">${v}</span>`).join(' ');
+  const sChips=xs.map((v,i)=>{
+    let cls='so';
+    if(Array.isArray(medIdx)?(i===medIdx[0]||i===medIdx[1]):i===medIdx) cls='me';
+    return `<span class="chip ${cls}">x<sub>(${i+1})</sub>=${v}</span>`;
+  }).join(' ');
+  const innerVals=xs.slice(rT,n-rT).map((v,i)=>`x<sub>(${rT+i+1})</sub>=${v}`).join(', ');
+
+  const stepA=`<div class="step a">
+    ${blr(`X̄ = (${data.join('+')})/n = <span class="res">${f4(xbar)}</span>`,`Sum divided by n — Sample mean`)}
+    ${blr(`s² = Σ(xᵢ−X̄)²/(n−1) = <span class="res">${f4(s2)}</span>`,`Unbiased sample variance (n−1 denominator)`)}
+    ${blr(`s = √s² = <span class="res">${f4(s)}</span>`,`Sample standard deviation`)}
+    ${blr(`aₙ = Γ(n/2)·√2 / [Γ((n−1)/2)·√(n−1)] = <span class="res">${f4(an)}</span>`,`Correction factor: s/aₙ gives unbiased σ estimator`)}
+    ${blr(`σ̂ = s / aₙ = ${f4(s)} / ${f4(an)} = <span class="res">${f4(sigHat)}</span>`,`Unbiased estimator of scale parameter σ`)}
+  </div>`;
+
+  const medStr=n%2===1?`x<sub>(${depth})</sub> = ${med}`:`(x<sub>(${n/2})</sub>+x<sub>(${n/2+1})</sub>)/2 = (${xs[n/2-1]}+${xs[n/2]})/2 = ${med}`;
+  const stepB=`<div class="step">
+    ${blr(`Sıralı / Sorted: [${xs.join(', ')}]`,`Order data ascending`)}
+    ${blr(`depth = (n+1)/2 = ${(n+1)/2} → ${n%2===1?'tek n / odd n':'çift n / even n → ortalama / average'}`,`Depth of median`)}
+    ${blr(`X̃ = ${medStr} = <span class="res">${f4(med)}</span>`,`Median of the sample`)}
+  </div>`;
+
+  const stepC=`<div class="step">
+    ${blr(`r = ⌊0.5+α·n⌋ = ⌊0.5+${alpha}·${n}⌋ = ⌊${(.5+alpha*n).toFixed(4)}⌋ = <span class="hi">${rT}</span>`,`Winsorization count per side`)}
+    ${blr(`İç değerler / Inner: ${innerVals}`,`Observations from position r+1 to n−r in sorted data`)}
+    ${blr(`μ̂_T = (${xs.slice(rT,n-rT).join('+')})/( ${n}−2·${rT}) = <span class="res">${f4(tmu)}</span>`,`Tukey location = mean of inner observations`)}
+    ${blr(`σ̂_T numeratör: Σinner(x−μ̂_T)² + r·[wing terms], bölen: n−2r−1 = ${n-2*rT-1}`,`Winsorized variance formula`)}
+    ${blr(`σ̂_T = <span class="res">${f4(tsig)}</span>`,`Tukey scale estimate`)}
+  </div>`;
+
+  const stepD=`<div class="step">
+    ${blr(`g = ⌊α·n⌋ = ⌊${alpha}·${n}⌋ = <span class="hi">${g}</span>`,`Fully trimmed observations per side`)}
+    ${blr(`r = α·n − g = ${alpha*n} − ${g} = <span class="hi">${rem}</span>`,`Fractional weight for boundary observations`)}
+    ${blr(`μ̂_Trim = {Σinner + (1−r)·[x<sub>(${g+1})</sub>+x<sub>(${n-g})</sub>]} / [n·(1−2α)]`,`Inner obs get full weight, boundary get (1−r) weight`)}
+    ${blr(`= {${(trimMu*n*(1-2*alpha)).toFixed(4)}} / ${(n*(1-2*alpha)).toFixed(4)} = <span class="res">${f4(trimMu)}</span>`,`Numeric result`)}
+  </div>`;
+
+  // T formula steps
+  const lmiLabel=`x<sub>(${lmi+1})</sub> = ${xs[lmi]}`;
+  const stepT=tForm===2?`<div class="step">
+    ${blr(`T₂ = (Min + 2·Medyan + Max) / 4 = (${xs[0]} + 2·${med} + ${xs[n-1]}) / 4`,`Weighted average: double weight for median`)}
+    ${blr(`= ${xs[0]+2*med+xs[n-1]} / 4 = <span class="res">${f4(T2)}</span>`,`Numeric result`)}
+    ${n%2===0?blr(`Medyan katsayı vektörü / Median coeff: x<sub>(${n/2})</sub> ve x<sub>(${n/2+1})</sub> için a=[...1/4,1/4...] ifade edilir`,`Hint: express Median in terms of ordered observations to find a vector`):''}
+  </div>`:
+  `<div class="step">
+    ${blr(`T₁ = (Min + x<sub>(⌊(n+1)/2⌋)</sub> + Max) / 3 = (x<sub>(1)</sub> + ${lmiLabel} + x<sub>(${n})</sub>) / 3`,`Lower-median position: ⌊(${n}+1)/2⌋ = ${lmi+1} (tek/odd n → gerçek medyan)`)}
+    ${blr(`= (${xs[0]} + ${xs[lmi]} + ${xs[n-1]}) / 3 = <span class="res">${f4(T1)}</span>`,`Numeric result`)}
+  </div>`;
+
+  // BLUE section
+  let blueHTML='';
+  if(blue){
+    const c0=blue.coef[0].map(x=>x.toFixed(4));
+    const c1=blue.coef[1].map(x=>x.toFixed(4));
+    blueHTML=`
+      ${rr('μ* (BLUE konum tahmini)','μ* — Best Linear Unbiased Estimator of μ',f4(blue.mu))}
+      ${rr('σ* (BLUE ölçek tahmini)','σ* — Best Linear Unbiased Estimator of σ',f4(blue.sigma))}
+      <div class="step b">
+        ${blr(`coef = (AᵀΩ⁻¹A)⁻¹Aᵀ Ω⁻¹ &nbsp; (2×${n} matris — ex ve Ω sayısaldan hesaplandı)`,`BLUE coefficient matrix from GLS with numerically computed ex & Ω`)}
+        ${blr(`μ* katsayıları / μ* coef: <span class="ccr">${c0.map(v=>`<span class="cc">${v}</span>`).join('')}</span>`,`Row 1 of coef · sorted data x_(1)...x_(n)`)}
+        ${blr(`σ* katsayıları / σ* coef: <span class="ccr">${c1.map(v=>`<span class="cc">${v}</span>`).join('')}</span>`,`Row 2 of coef · sorted data`)}
+        ${blr(`μ* = ${c0.map((c,i)=>`${c}×${xs[i]}`).join('+')} = <span class="res">${f4(blue.mu)}</span>`,`Weighted sum`)}
+        ${blr(`σ* = ${c1.map((c,i)=>`${c}×${xs[i]}`).join('+')} = <span class="res">${f4(blue.sigma)}</span>`,`Weighted sum`)}
+      </div>`;
+  }else{
+    blueHTML=`<div class="warn">BLUE hesabı başarısız — matris tekil olabilir / BLUE failed — matrix may be singular.</div>`;
+  }
+
+  // ex and OM display (collapsible)
+  const exDisplay=`<div class="exvec">${ex.map((v,i)=>`<span class="exc">μ<sub>${i+1}:${n}</sub> = ${f4(v)}</span>`).join('')}</div>`;
+  let omDisplay='';
+  if(n<=8){
+    const rows=om.map((r,i)=>`<div class="mat-row">${r.map((v,j)=>`<span class="mat-c ${i===j?'hi':''}">${f4(v)}</span>`).join('')}</div>`).join('');
+    omDisplay=`<div class="mat"><span class="mat-b">[</span><div class="mat-in">${rows}</div><span class="mat-b">]</span></div>`;
+  }else{
+    omDisplay=`<div class="info">Ω matrisi n=${n} için büyük — diyagonal değerler: ${om.map((r,i)=>f4(r[i])).join(', ')}</div>`;
+  }
+
+  return `<div class="section">
+    <div class="sh" onclick="tog(this)">
+      <span class="tag q1">SORU 1 / Q1</span>
+      <span class="title">Tahmin Edicilerin Hesabı (a–f) <span class="en">Computation of Estimators</span></span>
+      <span class="tog">▾</span>
+    </div>
+    <div class="sb">
+      <div class="ss">${sst('','Veri Seti','Data Set — n = '+n+', α = '+R.alpha+', T formülü: T'+R.tForm)}
+        <div class="rr"><span class="lbl"><span class="t">Ham veri / Raw</span></span><div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:3px">${dChips}</div></div>
+        <div class="rr"><span class="lbl"><span class="t">Sıralı / Sorted</span></span><div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:3px">${sChips}</div></div>
+      </div>
+      <div class="ss">${sst('a','a · Temel İstatistikler','Basic Statistics')}
+        ${rr('X̄ (örneklem ortalaması)','Sample mean',f4(xbar))}
+        ${rr('s² (örneklem varyansı)','Sample variance',f4(s2),'bölen / divisor = n−1')}
+        ${rr('s (std. sapma / std. dev.)',`s = √s²`,f4(s))}
+        ${rr('aₙ (düzeltme katsayısı)','Correction factor',f4(an))}
+        ${rr('σ̂ = s/aₙ (yansız σ tahmini)','Unbiased σ estimator',f4(sigHat))}
+        ${stepA}
+      </div>
+      <div class="ss">${sst('a','b · Örneklem Medyanı','Sample Median')}
+        ${rr('X̃ (medyan / median)',n%2===1?`depth = ${depth}`:`x(${n/2}) ve x(${n/2+1}) ortalaması / avg of two middle`,f4(med))}
+        ${stepB}
+      </div>
+      <div class="ss">${sst('a','c · Tukey Tahmin Edicileri (α = '+alpha+')','Tukey Estimators')}
+        ${rr('r (winsorlama / winsorization count)',`⌊0.5+α·n⌋`,rT)}
+        ${rr('μ̂_T (Tukey konum)','Tukey location estimate',f4(tmu))}
+        ${rr('σ̂_T (Tukey ölçek)','Tukey scale estimate',f4(tsig))}
+        ${stepC}
+      </div>
+      <div class="ss">${sst('a','d · Kırpılmış Ortalama (α = '+alpha+')','Trimmed Mean')}
+        ${rr('g (tam kırpılan / fully trimmed)',`⌊α·n⌋`,g)}
+        ${rr('r (kesirli ağırlık / fractional weight)','α·n − g',rem)}
+        ${rr('μ̂_Trim (kırpılmış ort. / trimmed mean)','Weighted average of retained observations',f4(trimMu))}
+        ${stepD}
+      </div>
+      <div class="ss">${sst('a','e · BLUE — μ* ve σ*','Best Linear Unbiased Estimators')}
+        <div class="info">ex ve Ω değerleri sayısal entegrasyonla hesaplandı (n=${n}) / ex &amp; Ω computed via numerical integration</div>
+        <div class="ss-title" style="font-size:10px;color:var(--dim);margin:6px 0 2px;text-transform:none">Beklenen değerler / Expected values of Z_(i:n):</div>
+        ${exDisplay}
+        ${n<=8?`<div class="ss-title" style="font-size:10px;color:var(--dim);margin:6px 0 2px;text-transform:none">Ω matrisi (varyans-kovaryans / variance-covariance):</div>${omDisplay}`:''}
+        ${blueHTML}
+      </div>
+      <div class="ss">${sst('a','f · T İstatistiği<span class="tf-badge">T${tForm}</span>','T Statistic')}
+        ${rr('T₁ = (Min+x_(⌊(n+1)/2⌋)+Max)/3','T₁ formula (lower median)',f4(T1))}
+        ${rr('T₂ = (Min+2·Medyan+Max)/4','T₂ formula (proper median with double weight)',f4(T2))}
+        ${rr('Seçilen / Selected: T'+tForm,'Active formula',f4(Tval),'<span style="color:var(--purple)">★</span>')}
+        ${stepT}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ════════════════════════════════
+//  Q2: VARIANCES & COMPARISON
+// ════════════════════════════════
+function renderQ2(R){
+  const{n,xs,om,ex,blue,alpha,rT,g,rem,lmi,tForm}=R;
+  // Var(X̄) = σ²/n
+  const vXbar=1/n;
+  // Var(X̃)
+  let aMedian=new Array(n).fill(0),vMedian;
+  if(n%2===1){const mi=(n-1)/2;aMedian[mi]=1;vMedian=om[mi][mi];}
+  else{const m1=n/2-1,m2=n/2;aMedian[m1]=.5;aMedian[m2]=.5;vMedian=qf(aMedian,om);}
+  // Var(μ̂_T) - Tukey
+  const aTukey=new Array(n).fill(0);
+  for(let i=rT;i<=n-rT-1;i++)aTukey[i]=1/(n-2*rT);
+  const vTukey=qf(aTukey,om);
+  // Var(μ*) - BLUE (≈ σ²/n for normal; numerical from coef)
+  const vBlue=blue?qf(blue.coef[0],om):null;
+  // Var(T) - from selected formula
+  let aT=new Array(n).fill(0);
+  if(tForm===2){
+    if(n%2===1){const mi=(n-1)/2;aT[0]=1/4;aT[mi]=2/4;aT[n-1]=1/4;}
+    else{const m1=n/2-1,m2=n/2;aT[0]=1/4;aT[m1]=1/4;aT[m2]=1/4;aT[n-1]=1/4;}
+  }else{
+    aT[0]=1/3;aT[lmi]+=1/3;aT[n-1]+=1/3;
+  }
+  const vT=qf(aT,om);
+
+  const stepXbar=`<div class="step a">
+    ${blr(`Var(X̄) = σ²/n = σ²/${n} = <span class="res">${f4(vXbar)}·σ²</span>`,`IID observations: variances add, then divide by n² ⟹ σ²/n`)}
+  </div>`;
+  const stepMedian=`<div class="step">
+    ${n%2===1?blr(`a=[0,...,1,...,0] (1 at position ${(n-1)/2+1}) → Var(X̃)=a'Ωa=ω<sub>${(n+1)/2},${(n+1)/2}</sub> = <span class="res">${f4(vMedian)}·σ²</span>`,`Odd n: direct diagonal element of Ω`):blr(`a=[0,...,½,½,...,0] (½ at positions ${n/2} and ${n/2+1}) → a'Ωa = <span class="res">${f4(vMedian)}·σ²</span>`,`Even n: median averages two obs → quadratic form`)}
+  </div>`;
+  const stepTukey=`<div class="step">
+    ${blr(`a=${aVec(aTukey,n)}`,`Tukey: equal weight 1/(n−2r) to inner ${n-2*rT} observations`)}
+    ${blr(`Var(μ̂_T) = a'Ωa = <span class="res">${f4(vTukey)}·σ²</span>`,`Quadratic form using Ω matrix`)}
+  </div>`;
+  const stepBlue=vBlue!==null?`<div class="step b">
+    ${blr(`a = coef[0] → a'Ωa = <span class="res">${f4(vBlue)}·σ²</span>  (≈ σ²/${n} = ${f4(1/n)}·σ²)`,`BLUE of μ for normal = sample mean → Var(μ*)=σ²/n (Gauss-Markov)`)}
+  </div>`:'';
+  const stepT=`<div class="step">
+    ${blr(`a = ${aVec(aT,n)}`,`T${tForm} coefficient vector based on selected formula`)}
+    ${blr(`Var(T${tForm}) = a'Ωa = <span class="res">${f4(vT)}·σ²</span>`,`Quadratic form computation`)}
+  </div>`;
+
+  const ests=[
+    {tr:'X̄',en:'Sample Mean',v:vXbar,a:`[1/${n},...,1/${n}]`},
+    {tr:'μ*',en:'BLUE of μ',v:vBlue??vXbar,a:'coef[0]'},
+    {tr:`T${tForm}`,en:tForm===2?'(Min+2Med+Max)/4':'(Min+Med+Max)/3',v:vT,a:aVec(aT,n)},
+    {tr:'μ̂_T',en:`Tukey (α=${alpha})`,v:vTukey,a:aVec(aTukey,n)},
+    {tr:'X̃',en:'Sample Median',v:vMedian,a:aVec(aMedian,n)},
+  ].sort((a,b)=>a.v-b.v);
+
+  const rows=ests.map((e,i)=>{
+    const cl=i===0?'best':i===ests.length-1?'worst':'';
+    const badge=i===0?`⭐ En İyi / Best`:i===ests.length-1?'⚠ En Kötü / Worst':'';
+    return `<tr><td class="est">${e.tr} <span style="color:var(--en);font-size:10px;font-style:italic">(${e.en})</span></td><td class="val">${f4(e.v)}·σ²</td><td style="color:var(--dim);font-size:10px">${e.a}</td><td class="${cl}" style="font-size:11px">${badge}</td></tr>`;
+  }).join('');
+
+  const strip=ests.map((e,i)=>{
+    let cl='',lt='',le='';
+    if(i===0){cl='best';lt='En İyi';le='Best';}
+    if(i===ests.length-1){cl='worst';lt='En Kötü';le='Worst';}
+    return `<div class="ri ${cl}"><div class="rn">${e.tr}</div><div class="rv">${f4(e.v)}σ²</div>${lt?`<div class="rl">${lt}</div><div class="rle">${le}</div>`:''}</div>`;
+  }).join('<span class="ra">→</span>');
+
+  return `<div class="section">
+    <div class="sh" onclick="tog(this)">
+      <span class="tag q2">SORU 2 / Q2</span>
+      <span class="title">Beklenen Değer, Varyans ve Karşılaştırma <span class="en">Expected Values, Variances &amp; Efficiency Ranking</span></span>
+      <span class="tog">▾</span>
+    </div>
+    <div class="sb">
+      <div class="ss">${sst('','Yansızlık','Unbiasedness')}
+        <div class="step" style="border-left-color:var(--green)">
+          ${blr(`<span class="em">Tüm tahmin ediciler μ için yansızdır.</span>`,`<span class="em">All estimators are unbiased for μ.</span>`)}
+          ${blr(`Kanıt: E(aᵀX) = aᵀ(μ·1 + σ·ex). Simetrik ex ve aᵀ1=1 → bias=0.`,`Symmetric ex: positive/negative terms cancel when a is symmetric and sums to 1`)}
+        </div>
+      </div>
+      <div class="ss">${sst('','a · Var(X̄)','Variance of Sample Mean')}${rr('Var(X̄)','',f4(vXbar)+'·σ²')}${stepXbar}</div>
+      <div class="ss">${sst('','b · Var(X̃)','Variance of Sample Median')}${rr('Var(X̃)','',f4(vMedian)+'·σ²')}${stepMedian}</div>
+      <div class="ss">${sst('','c · Var(μ̂_T)','Variance of Tukey Estimate')}${rr('Var(μ̂_T)','',f4(vTukey)+'·σ²')}${stepTukey}</div>
+      <div class="ss">${sst('','d · Var(μ*)','Variance of BLUE (min. possible)') }${vBlue!==null?rr('Var(μ*)','',f4(vBlue)+'·σ²'):''}${stepBlue}</div>
+      <div class="ss">${sst('','e · Var(T'+tForm+')','Variance of T Statistic')}${rr('Var(T'+tForm+')','',f4(vT)+'·σ²')}${stepT}</div>
+      <div class="ss">${sst('a','Karşılaştırma — En İyi → En Kötü','Efficiency Ranking — Best → Worst')}
+        <div class="rs">${strip}</div>
+        <table><thead><tr>
+          <th>Tahmin Edici<span class="en">Estimator</span></th>
+          <th>Varyans katsayısı<span class="en">Variance coefficient</span></th>
+          <th>Katsayı vektörü a<span class="en">Coefficient vector</span></th>
+          <th>Sıra<span class="en">Rank</span></th>
+        </tr></thead><tbody>${rows}</tbody></table>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ════════════════════════════════
+//  Q3: RANGE ANALYSIS
+// ════════════════════════════════
+function renderQ3(R){
+  const{n,ex,om}=R;
+  const ER_c=ex[n-1]-ex[0];
+  const VR_c=om[n-1][n-1]+om[0][0]-2*om[0][n-1];
+  const bR=ER_c-1,MSE=bR**2+VR_c,VS=VR_c/(ER_c**2),RE=100*MSE/VS;
+
+  const stepER=`<div class="step b">
+    ${blr(`E(R) = E(X<sub>(n)</sub>−X<sub>(1)</sub>) = σ·E(Z<sub>(n)</sub>−Z<sub>(1)</sub>)`,`Standardize: X_(i) = μ + σZ_(i) → range = σ·(Z_(n)−Z_(1))`)}
+    ${blr(`= σ·(μ<sub>${n}:${n}</sub>−μ<sub>1:${n}</sub>) = σ·(${f4(ex[n-1])} − (${f4(ex[0])})) = <span class="res">${f4(ER_c)}·σ</span>`,`Look up ex[${n}] and ex[1] from computed expected value table`)}
+  </div>`;
+  const stepVR=`<div class="step b">
+    ${blr(`Var(R) = σ²·[Var(Z<sub>(${n})</sub>)+Var(Z<sub>(1)</sub>)−2·Cov(Z<sub>(${n})</sub>,Z<sub>(1)</sub>)]`,`Var(A−B) = Var(A)+Var(B)−2Cov(A,B)`)}
+    ${blr(`= σ²·[ω<sub>${n}${n}</sub>+ω<sub>11</sub>−2ω<sub>1${n}</sub>] = σ²·[${f4(om[n-1][n-1])}+${f4(om[0][0])}−2·${f4(om[0][n-1])}] = <span class="res">${f4(VR_c)}·σ²</span>`,`Values from numerically computed Ω matrix`)}
+  </div>`;
+  const stepBias=`<div class="step">
+    ${blr(`bias(R) = E(R)−σ = ${f4(ER_c)}σ−σ = (${f4(ER_c)}−1)σ = <span class="res">${f4(bR)}·σ</span>`,`R overestimates σ by factor ${f4(ER_c)} — it is biased`)}
+  </div>`;
+  const stepMSE=`<div class="step">
+    ${blr(`MSE(R) = [bias(R)]²+Var(R) = (${f4(bR)})²σ²+${f4(VR_c)}σ²`,`Mean Squared Error = squared bias + variance`)}
+    ${blr(`= ${f4(bR**2)}σ²+${f4(VR_c)}σ² = <span class="res">${f4(MSE)}·σ²</span>`,`Bias term dominates`)}
+  </div>`;
+  const stepSH=`<div class="step a">
+    ${blr(`E(R)=${f4(ER_c)}σ ⟹ E(R/${f4(ER_c)})=σ → <span class="em">σ̂ = R / ${f4(ER_c)}</span>`,`Divide by E(R)/σ to remove bias and create unbiased estimator`)}
+    ${blr(`Var(σ̂) = (1/${f4(ER_c)})²·Var(R) = ${f4(VS)}·σ²`,`Var(cX)=c²Var(X) with c=1/${f4(ER_c)}`)}
+    ${blr(`MSE(σ̂) = Var(σ̂) = ${f4(VS)}·σ² (yansız / unbiased → bias=0)`,`Unbiased: MSE = Variance only`)}
+  </div>`;
+  const stepRE=`<div class="step a">
+    ${blr(`RE(σ̂|R) = 100·MSE(R)/MSE(σ̂) = 100·${f4(MSE)}/${f4(VS)} = <span class="res">${RE.toFixed(1)}%</span>`,`How many times worse R is compared to the unbiased σ̂`)}
+    ${blr(`<span class="em">Yorum / Interpretation:</span> R yanlıdır; σ̂ <span class="res">${RE.toFixed(0)}×</span> daha verimlidir.`,`R is heavily biased. σ̂ removes bias and has much smaller MSE.`)}
+  </div>`;
+
+  return `<div class="section">
+    <div class="sh" onclick="tog(this)">
+      <span class="tag q3">SORU 3 / Q3</span>
+      <span class="title">Örneklem Menzili Analizi (n=${n}) <span class="en">Sample Range R = Max−Min Analysis</span></span>
+      <span class="tog">▾</span>
+    </div>
+    <div class="sb">
+      <div class="ss">${sst('b','Beklenen Değer ve Varyans','E(R), Var(R), bias and MSE')}
+        <div class="cards">
+          ${crd('tl','E(R)/σ','Expected range (σ units)',f4(ER_c),`ex[${n}]−ex[1]`)}
+          ${crd('bl','Var(R)/σ²','Variance of R',f4(VR_c),`ω${n}${n}+ω₁₁−2ω₁${n}`)}
+          ${crd('rd','bias(R)/σ','Bias of R as σ estimator',f4(bR),'E(R)/σ − 1')}
+          ${crd('rd','MSE(R)/σ²','Mean Squared Error',f4(MSE),'bias²+Var')}
+        </div>
+        ${stepER}${stepVR}${stepBias}${stepMSE}
+      </div>
+      <div class="ss">${sst('a','Yansız Tahmin Edici / Unbiased Estimator','σ̂ = R / '+f4(ER_c))}
+        <div class="cards">
+          ${crd('am','Var(σ̂)/σ²','Variance of σ̂',f4(VS),'Var(R)/E(R)²')}
+          ${crd('gr','RE(σ̂|R)','Relative efficiency',RE.toFixed(1)+'%','100·MSE(R)/Var(σ̂)')}
+        </div>
+        ${stepSH}${stepRE}
+        <div class="step" style="border-left-color:var(--green)">
+          ${blr(`<span class="em">Sonuç:</span> R σ'yı yanlı tahmin eder; σ̂=R/${f4(ER_c)} yansızdır ve <span class="res">${RE.toFixed(0)}×</span> daha verimlidir.`,`<span class="em">Conclusion:</span> σ̂ removes bias and has ${RE.toFixed(0)}× smaller MSE than raw range R.`)}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ════════════════════════════════
+//  TOGGLE & MAIN
+// ════════════════════════════════
+function tog(sh){
+  const sb=sh.nextElementSibling;
+  sb.classList.toggle('hidden');
+  sh.querySelector('.tog').textContent=sb.classList.contains('hidden')?'▸':'▾';
+}
+
+function compute(){
+  const raw=document.getElementById('inp').value;
+  const alpha=parseFloat(document.getElementById('alf').value);
+  const tForm=parseInt(document.getElementById('tform').value);
+  const data=raw.trim().split(/[\s,]+/).map(Number).filter(x=>!isNaN(x));
+  const btn=document.getElementById('btn');
+
+  if(data.length<3){document.getElementById('out').innerHTML='<div class="warn">En az 3 veri noktası girin / Enter at least 3 data points.</div>';return;}
+  if(data.length>20){document.getElementById('out').innerHTML='<div class="warn">n ≤ 20 desteklenmektedir / n ≤ 20 supported (Ω hesabı için / for Ω computation).</div>';return;}
+  if(isNaN(alpha)||alpha<=0||alpha>=0.5){document.getElementById('out').innerHTML='<div class="warn">α: 0 ile 0.5 arasında olmalı / must be between 0 and 0.5.</div>';return;}
+
+  btn.disabled=true;
+  document.getElementById('out').innerHTML='<div class="loading"><div class="spinner"></div>ex ve Ω matrisi sayısal hesaplanıyor (n='+data.length+')... &nbsp;/ Computing ex &amp; Ω numerically...</div>';
+
+  setTimeout(()=>{
+    try{
+      const R=calcAll(data,alpha,tForm);
+      document.getElementById('out').innerHTML=renderQ1(R)+renderQ2(R)+renderQ3(R);
+    }catch(e){
+      document.getElementById('out').innerHTML=`<div class="warn">Hata/Error: ${e.message}</div>`;
+      console.error(e);
+    }finally{
+      btn.disabled=false;
+    }
+  },20);
+}
+compute();
+</script>
+</body>
+</html>
